@@ -1,0 +1,63 @@
+#include <stdio.h>
+
+struct MinMax {
+    int min;
+    int max;
+};
+
+struct MinMax findMinMax(int arr[], int left, int right) {
+    struct MinMax result, leftResult, rightResult;
+    int mid;
+    if (left == right) {
+        result.min = arr[left];
+        result.max = arr[left];
+        return result;
+    }
+    if (right == left + 1) {
+        if (arr[left] < arr[right]) {
+            result.min = arr[left];
+            result.max = arr[right];
+        } else {
+            result.min = arr[right];
+            result.max = arr[left];
+        }
+        return result;
+    }
+    mid = (left + right) / 2;
+    leftResult = findMinMax(arr, left, mid);
+    rightResult = findMinMax(arr, mid + 1, right);
+
+    if (leftResult.min < rightResult.min)
+        result.min = leftResult.min;
+    else
+        result.min = rightResult.min;
+
+    if (leftResult.max > rightResult.max)
+        result.max = leftResult.max;
+    else
+        result.max = rightResult.max;
+
+    return result;
+}
+
+int main() {
+    int n;
+
+    printf("Enter the number of elements in the list: ");
+    scanf("%d", &n);
+
+    int arr[n];
+
+    printf("Enter the elements of the list:\n");
+    int i;
+    for (i = 0; i < n; i++) {
+        scanf("%d", &arr[i]);
+    }
+
+    struct MinMax result = findMinMax(arr, 0, n - 1);
+
+    printf("Minimum value: %d\n", result.min);
+    printf("Maximum value: %d\n", result.max);
+
+    return 0;
+}
