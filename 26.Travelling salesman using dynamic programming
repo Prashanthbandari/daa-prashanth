@@ -1,28 +1,56 @@
 #include <stdio.h>
+#include <limits.h>
 
-int isPerfect(int num) {
-    int sum = 0,i;
+#define MAX_V 10 
+int min(int a, int b) {
+    return (a < b) ? a : b;
+}
+int tsp(int n, int graph[][MAX_V], int mask, int pos, int dp[][MAX_V]) {
+    if (mask == (1 << n) - 1)
+        return graph[pos][0];
+    if (dp[mask][pos] != -1)
+        return dp[mask][pos];
 
-    for ( i = 1; i <= num / 2; i++) {
-        if (num % i == 0) {
-            sum += i;
+    int ans = INT_MAX;
+    for (int city = 0; city < n; city++) {
+        if ((mask & (1 << city)) == 0) { 
+            int newAns = graph[pos][city] + tsp(n, graph, mask | (1 << city), city, dp);
+            ans = min(ans, newAns);
         }
     }
 
-    return (sum == num);
+    return dp[mask][pos] = ans;
+}
+void initialize(int n, int dp[][MAX_V]) {
+    for (int i = 0; i < (1 << n); i++) {
+        for (int j = 0; j < n; j++) {
+            dp[i][j] = -1;
+        }
+    }
 }
 
 int main() {
-    int num;
+    int n;
+    printf("Enter the number of cities: ");
+    scanf("%d", &n);
 
-    printf("Enter a number: ");
-    scanf("%d", &num);
-
-    if (isPerfect(num)) {
-        printf("%d is a perfect number.\n", num);
-    } else {
-        printf("%d is not a perfect number.\n", num);
+    if (n <= 1 || n > MAX_V) {
+        printf("Invalid number of cities.\n");
+        return 1;
     }
+    int graph[MAX_V][MAX_V];
+    printf("Enter the distances between cities (0-indexed):\n");
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            scanf("%d", &graph[i][j]);
+        }
+    }
+    int dp[1 << MAX_V][MAX_V];
+    initialize(n, dp);
+    int mask = 1;
+    int pos = 0;
+    int minCost = tsp(n, graph, mask, pos, dp);
+    printf("Minimum cost for TSP: %d\n", minCost);
 
     return 0;
 }
